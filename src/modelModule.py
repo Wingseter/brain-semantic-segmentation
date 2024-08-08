@@ -6,9 +6,12 @@ from monai.networks.layers import *
 from monai.metrics import compute_generalized_dice
 from monai.inferers import SimpleInferer, SlidingWindowInferer
 
-class BrianModel(L.LightningModule):
+from importlib import import_module
+
+class ModelModule(L.LightningModule):
     def __init__(
         self,
+        model_name: str = "BaseModel",
         learning_rate: float = 1e-2,
         use_scheduler: bool = True,    
     ):
@@ -17,17 +20,9 @@ class BrianModel(L.LightningModule):
         self.learning_rate = learning_rate
         self.use_scheduler = use_scheduler
 
-        ## TODO CHANGE IT TO SELECT MODEL
-        self._model = SegResNet(
-            blocks_down=[1, 2, 2, 4],
-            blocks_up=[1, 1, 1],
-            init_filters=16,
-            in_channels=4,
-            out_channels=3,
-            dropout_prob=0.2,
-        )
+        self._model = getattr(import_module("models"),'PretrainedModel')
 
-        self.criterion=DiceLoss(to_onehot_y=True, softmax=True)
+        self.criterion = DiceLoss(to_onehot_y=True, softmax=True)
 
     def forward(self, x):
         return self._model(x)

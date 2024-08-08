@@ -13,8 +13,8 @@ from lightning.pytorch.callbacks import (
 from lightning.pytorch.loggers import TensorBoardLogger
 from omegaconf import DictConfig
 
-from src.data_module import *
-from src.model import *
+from dataModule import *
+from modelModule import *
 from src.utils import *
 
 @hydra.main(version_base=None, config_path="conf", config_name="config")
@@ -33,8 +33,8 @@ def train(cfg:DictConfig) -> None:
     )
     dm.setup()
 
-    ## TODO You have to make it changable with cfg files 
-    model = BrainModel(
+    model = ModelModule(
+        model_select = cfg.model_name,
         leanring_rate = cfg.learning_rate,
         use_scheduler = cfg.use_scheduler,
     )
