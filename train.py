@@ -54,7 +54,7 @@ def train(cfg:DictConfig) -> None:
     ## TODO You have to make it changable with cfg files 
     early_stopping = EarlyStopping(
         monitor="val_loss",
-        patience=10,
+        patience=cfg.early_stopping_patient,
         verbose=True,
         mode="min",
     )

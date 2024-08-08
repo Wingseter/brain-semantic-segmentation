@@ -20,7 +20,7 @@ class ModelModule(L.LightningModule):
         self.learning_rate = learning_rate
         self.use_scheduler = use_scheduler
 
-        self._model = getattr(import_module("models"),'PretrainedModel')
+        self._model = getattr(import_module("models"),'SegResnet_option1')
 
         self.criterion = DiceLoss(to_onehot_y=True, softmax=True)
 

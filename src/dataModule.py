@@ -1,12 +1,8 @@
-import lightning as L
-from monai.transforms import (
-    Compose,
-    CropForegraound,
-
-)
 from torch.utils.data import DataLoader
 
-class BrainDataModule(L.LightningDataModule):
+from importlib import import_module
+
+class DataModule(L.LightningDataModule):
     def __init__(
         self,
         root_dir: str,
@@ -24,34 +20,15 @@ class BrainDataModule(L.LightningDataModule):
 
 
     def setup(self, stage=None):
+        augment_module = getattr(import_module("augmentation"),'BratsAugmentation')
         # Training transform
-        train_transform = Compose(
-            [
-                LoadImaged(keys=["image", "label"]),
-                EnsureChannelFirstd(keys="image"),
-                EnsureTyped(keys=["image", "label"]),
-                ConvertToMultiChannelBasedOnBratsClassesd(keys="label"),
-                Orientationd(keys=["image", "label"], axcodes="RAS"),
-                Resized(keys=["image"], spatial_size=[128, 128, 80], mode="bilinear"),
-                Resized(keys=["label"], spatial_size=[128, 128, 80], mode="nearest"),
-            ]
-        )
+        train_transform = augment_module()
 
         # Validation transform
-        val_transform = Compose(
-            [
-                LoadImaged(keys=["image", "label"]),
-                EnsureChannelFirstd(keys="image"),
-                EnsureTyped(keys=["image", "label"]),
-                ConvertToMultiChannelBasedOnBratsClassesd(keys="label"),
-                Orientationd(keys=["image", "label"], axcodes="RAS"),
-                Resized(keys=["image"], spatial_size=[128, 128, 80], mode="bilinear"),
-                Resized(keys=["label"], spatial_size=[128, 128, 80], mode="nearest"),
-            ]
-        )
+        val_transform = augment_module()
 
-        self.train_data = CacheDataset(data=train_dict, transform=train_transform, cache_rate=0.1, num_workers=3)
-        self.val_data = CacheDataset(data=valid_dict, transform=val_transform, cache_rate=0.1, num_workers=3)
+        self.train_data = CacheDataset(data=train_dict, transform=train_transform, cache_rate=0.1, num_workers=10)
+        self.val_data = CacheDataset(data=valid_dict, transform=val_transform, cache_rate=0.1, num_workers=10)
 
     def train_dataloader(self):
         return DataLoader(
