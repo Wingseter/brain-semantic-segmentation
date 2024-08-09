@@ -23,9 +23,10 @@ class DataModule(L.LightningDataModule):
         augment_module = getattr(import_module("augmentation"),'BratsAugmentation')
         # Training transform
         train_transform = augment_module()
-
         # Validation transform
         val_transform = augment_module()
+
+        dataset_module = getattr(import_module("dataset"), "")
 
         self.train_data = CacheDataset(data=train_dict, transform=train_transform, cache_rate=0.1, num_workers=10)
         self.val_data = CacheDataset(data=valid_dict, transform=val_transform, cache_rate=0.1, num_workers=10)
