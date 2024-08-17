@@ -1,11 +1,12 @@
 
-from monai.data import DataLoader, decollate_batch, Dataset, CacheDataset
+from BaseDataset import BaseDataset
 
-class BaseDataset(Dataset):
+class BrainDataset(BaseDataset):
     def __init__(self, img_path, transform):
-        super().__init__()
-        self.img_paths = img_path
-        self.transform = transform
+        super().__init__(img_path, transform)
+    
+
+
 
     def __getitem__(self, index):
         image = self.img_paths[index]
