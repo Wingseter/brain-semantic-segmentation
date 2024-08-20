@@ -1,18 +1,30 @@
-
 from typing import Any
-from monai.data import DataLoader, decollate_batch, Dataset, CacheDataset
+from abc import ABC, abstractmethod
+from dataset.BaseDataset import BaseDataset
 
-class BaseDataset(CacheDataset):
-    def __init__(self, img_path, transform):
-        super().__init__()
-        self.img_paths = img_path
-        self.transform = transform
+class BaseCacheDataset(BaseDataset, ABC):
+    def __init__(self, data_path: str, train_transform, valid_transform, cache_rate: float, num_workers: int):
+        super().__init__(data_path, train_transform=train_transform, valid_transform=valid_transform)
+        self.cache_rate = cache_rate
+        self.num_workers = num_workers
 
-    def __getitem__(self, index):
-        img_path = self.img_paths[index]
-        if self.transform:
-            image = self.transform(image)
-        return image
+    @abstractmethod
+    def train_dataset(self):
+        """
+        This method should be implemented in the subclass to return the training dataset.
+        """
+        pass
 
-    def __len__(self):
-        return len(self.img_paths)
+    @abstractmethod
+    def valid_dataset(self):
+        """
+        This method should be implemented in the subclass to return the validation dataset.
+        """
+        pass
+    
+    @abstractmethod
+    def test_dataset(self):
+        """
+        This method should be implemented in the subclass to return the test dataset.
+        """
+        pass
