@@ -18,7 +18,7 @@ from monai.transforms import (
 )
 
 class BaseAugmentation:
-    def __init__(self, resize, mean, std, **kwargs):
+    def __init__(self, **kwargs):
         self.transform = Compose(
             [
                 LoadImaged(keys=["image", "label"]),
@@ -27,5 +27,5 @@ class BaseAugmentation:
             ]
         )
 
-    def __call__(self, image):
-        return self.transform(image)
+    def __call__(self, data):
+        return self.transform(data)

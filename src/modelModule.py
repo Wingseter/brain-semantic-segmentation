@@ -20,9 +20,10 @@ class ModelModule(L.LightningModule):
         self.learning_rate = learning_rate
         self.use_scheduler = use_scheduler
 
-        self._model = getattr(import_module("models"),'SegResnet_option1')
+        select_model = getattr(import_module("src.models"), model_name)
+        self._model = select_model()
 
-        self.criterion = DiceLoss(to_onehot_y=True, softmax=True)
+        self.criterion = DiceLoss(smooth_nr=0, smooth_dr=1e-5, squared_pred=True, to_onehot_y=False, sigmoid=True)
 
     def forward(self, x):
         return self._model(x)
@@ -42,7 +43,7 @@ class ModelModule(L.LightningModule):
                 network = self._model,
             )
         
-        VAL_AMP = True
+        VAL_AMP = False
         if VAL_AMP:
             with torch.amp.autocast():
                 return _compute(input)
@@ -56,13 +57,14 @@ class ModelModule(L.LightningModule):
         y_pred = self._inference(x)
         dice = compute_generalized_dice(y_pred, y)
         dice = dice.mean() if len(dice) > 0 else dice
-        self.log("val_loss", loss, on_step = True, on_epoch = True, prob_bar = True)
-        self.log("val_dice", dice, on_step = True, on_epoch = True, prob_bar = True)
+        self.log("val_loss", loss, on_step = True, on_epoch = True, prog_bar = True)
+        self.log("val_dice", dice, on_step = True, on_epoch = True, prog_bar = True)
 
     def configure_optimizers(self):
-        optimizer = torch.optim.adamw(
-            self.parameters(), lr=self.learning_rate, weight_decay=0.05
-        )
+        # optimizer = torch.optim.AdamW(
+        #     self.parameters(), lr=self.learning_rate, weight_decay=0.05
+        # )
+        optimizer = torch.optim.Adam(self.parameters(), 1e-4, weight_decay=1e-5)
 
         configuration = {
             "optimizer": optimizer,

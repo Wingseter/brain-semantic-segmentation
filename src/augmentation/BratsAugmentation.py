@@ -7,11 +7,11 @@ from monai.transforms import (
     Resized,
 )
 
-from BaseAugmentation import BaseAugmentation
-from augmentation.transformModue import ConvertToMultiChannelBasedOnBratsClassesd
+from src.augmentation.BaseAugmentation import BaseAugmentation
+from src.augmentation.transformModue import ConvertToMultiChannelBasedOnBratsClassesd
 
 class BratsAugmentation_base(BaseAugmentation):
-    def __init__(self, resize, mean, std, **kwargs):
+    def __init__(self, **kwargs):
         self.transform = Compose(
             [
                 LoadImaged(keys=["image", "label"]),
@@ -23,6 +23,3 @@ class BratsAugmentation_base(BaseAugmentation):
                 Resized(keys=["label"], spatial_size=[128, 128, 80], mode="nearest"),
             ]
         )
-
-    def __call__(self):
-        return self.transform

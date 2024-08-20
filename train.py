@@ -13,8 +13,8 @@ from lightning.pytorch.callbacks import (
 from lightning.pytorch.loggers import TensorBoardLogger
 from omegaconf import DictConfig
 
-from dataModule import *
-from modelModule import *
+from src.dataModule import *
+from src.modelModule import *
 from src.utils import *
 
 @hydra.main(version_base=None, config_path="conf", config_name="config")
@@ -22,21 +22,25 @@ def train(cfg:DictConfig) -> None:
     # Create Unique run id by date and time
     run_id = generate_run_id()
 
+    seed_everything(cfg.seed)
     L.seed_everything(cfg.seed, workers=True)
+
     torch.set_float32_matmul_precision("high")
 
     # initialize DataModules
-    ## TODO this is temperary you have to implement datamodule
-    ## TODO You have to make it changable with cfg files 
-    dm = BrainDataModule(
-        root
+    dm = DataModule(
+        train_batch_size=cfg.experiment.train_batch_size,
+        valid_batch_size=cfg.experiment.valid_batch_size,
+        num_workers=cfg.num_workers,
+        transform_name=cfg.transform_name,
+        dataset_name=cfg.dataset_name,
+        dataset_params=cfg.dataset_params
     )
-    dm.setup()
 
     model = ModelModule(
-        model_select = cfg.model_name,
-        leanring_rate = cfg.learning_rate,
-        use_scheduler = cfg.use_scheduler,
+        model_name = cfg.model_name,
+        learning_rate = cfg.model_params.learning_rate,
+        use_scheduler = cfg.model_params.use_scheduler,
     )
 
     logger = TensorBoardLogger(save_dir=cfg.logs_dir, name = "", version=run_id)
@@ -49,27 +53,25 @@ def train(cfg:DictConfig) -> None:
         filename="{epoch}-{step}-{val_loss:.2f}-{val_dice:2f}",
     )
 
-    lr_monitor = LearningRateMonitor(loggin_interval = "step")
+    lr_monitor = LearningRateMonitor(logging_interval = "step")
 
-    ## TODO You have to make it changable with cfg files 
     early_stopping = EarlyStopping(
         monitor="val_loss",
-        patience=cfg.early_stopping_patient,
+        patience=cfg.experiment.early_stopping_patient,
         verbose=True,
         mode="min",
     )
 
-    trainer = L.trainer(
+    trainer = L.Trainer(
         max_epochs=cfg.max_epochs,
-        accelerator="auto",
+        accelerator=cfg.device,
         devices="auto",
         logger=logger,
         callbacks=[checkpoint_callback, lr_monitor, early_stopping],
     )
 
-    trainer.fit(model.dm)
+    trainer.fit(model, dm)
 
-if __name__ == "main":
+if __name__ == "__main__":
     train()
-
 
