@@ -1,4 +1,4 @@
-from BaseModel import BaseModel
+from .BaseModel import BaseModel
 from monai.networks.nets import SegResNet
 from monai.networks.layers import *
 from monai.networks.layers import Norm

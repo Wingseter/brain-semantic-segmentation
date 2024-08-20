@@ -20,7 +20,8 @@ class ModelModule(L.LightningModule):
         self.learning_rate = learning_rate
         self.use_scheduler = use_scheduler
 
-        self._model = getattr(import_module("models"), model_name)
+        select_model = getattr(import_module("src.models"), model_name)
+        self._model = select_model()
 
         self.criterion = DiceLoss(to_onehot_y=True, softmax=True)
 
@@ -60,9 +61,10 @@ class ModelModule(L.LightningModule):
         self.log("val_dice", dice, on_step = True, on_epoch = True, prob_bar = True)
 
     def configure_optimizers(self):
-        optimizer = torch.optim.adamw(
-            self.parameters(), lr=self.learning_rate, weight_decay=0.05
-        )
+        # optimizer = torch.optim.AdamW(
+        #     self.parameters(), lr=self.learning_rate, weight_decay=0.05
+        # )
+        optimizer = torch.optim.Adam(self.parameters(), 1e-4, weight_decay=1e-5)
 
         configuration = {
             "optimizer": optimizer,

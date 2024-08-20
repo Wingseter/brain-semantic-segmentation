@@ -1,30 +1,28 @@
-task: "brain-otock"
-root_dir: "./data"
+task: "brain-sementic-segmentation"
 device: "cuda"
+num_workers: 3
+seed: 42
+max_epochs: 100
 
 experiment:
-  seed: 42
   train_batch_size: 1
   valid_batch_size: 1
-  num_workers: 10
-  early_stopping_patient: 10
+  early_stopping_patient: 20
+
+
+transform_name: "BratsAugmentation_base"
+dataset_name: "BrainDataset"
+dataset_params:
+  data_path: "/Volumes/external/DeepLearningData/BraTS2020_training_data/BraTS2020_converted"
+  cache_rate: 0.5
+  num_workers: 3
+  train_valid_test_split_rate: [0.7, 0.2, 0.1]
 
 model_name: "SegResnet_option1"
-
-dataset_name: "BratsDataset"
-
-transform_name: "BratsTransform_base"
-
-dataset_params:
-  data_path: "./data"
-  transform: null  # or specify the actual transform class or parameters here
-  cache_rate: 0.5
-  num_workers: 10
-
 model_params:
   learning_rate: 1e-2
-  max_epochs: 100
   use_scheduler: true
+ 
 
 logs_dir: logs
 checkpoint_dirpath: checkpoints

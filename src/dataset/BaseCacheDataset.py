@@ -1,6 +1,6 @@
 from typing import Any
 from abc import ABC, abstractmethod
-from dataset.BaseDataset import BaseDataset
+from .BaseDataset import BaseDataset
 
 class BaseCacheDataset(BaseDataset, ABC):
     def __init__(self, data_path: str, train_transform, valid_transform, cache_rate: float, num_workers: int):
