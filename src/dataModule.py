@@ -60,6 +60,7 @@ class DataModule(L.LightningDataModule):
             batch_size=self.train_batch_size,
             shuffle=True,
             num_workers=self.num_workers,
+            persistent_workers=True
         )
 
     def val_dataloader(self):
@@ -68,6 +69,7 @@ class DataModule(L.LightningDataModule):
             batch_size=self.valid_batch_size,
             shuffle=False,
             num_workers=self.num_workers,
+            persistent_workers=True
         )
     
     def test_dataloader(self):

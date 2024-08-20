@@ -64,7 +64,7 @@ def train(cfg:DictConfig) -> None:
 
     trainer = L.Trainer(
         max_epochs=cfg.max_epochs,
-        accelerator="auto",
+        accelerator=cfg.device,
         devices="auto",
         logger=logger,
         callbacks=[checkpoint_callback, lr_monitor, early_stopping],

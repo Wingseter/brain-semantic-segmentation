@@ -1,5 +1,5 @@
 task: "brain-sementic-segmentation"
-device: "cuda"
+device: "auto"
 num_workers: 3
 seed: 42
 max_epochs: 100
