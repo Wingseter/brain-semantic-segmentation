@@ -17,4 +17,4 @@ class SegResnet_option1(BaseModel):
 
     def forward(self, x):
         y = self.segResnet(x)
-        return 
+        return y

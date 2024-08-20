@@ -29,12 +29,12 @@ def train(cfg:DictConfig) -> None:
 
     # initialize DataModules
     dm = DataModule(
-        cfg.experiment.train_batch_size,
-        cfg.experiment.valid_batch_size,
-        cfg.num_workers,
-        cfg.transform_name,
-        cfg.dataset_name,
-        cfg.dataset_params
+        train_batch_size=cfg.experiment.train_batch_size,
+        valid_batch_size=cfg.experiment.valid_batch_size,
+        num_workers=cfg.num_workers,
+        transform_name=cfg.transform_name,
+        dataset_name=cfg.dataset_name,
+        dataset_params=cfg.dataset_params
     )
 
     model = ModelModule(

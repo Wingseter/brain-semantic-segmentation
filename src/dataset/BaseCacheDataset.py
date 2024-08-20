@@ -3,8 +3,11 @@ from abc import ABC, abstractmethod
 from .BaseDataset import BaseDataset
 
 class BaseCacheDataset(BaseDataset, ABC):
-    def __init__(self, data_path: str, train_transform, valid_transform, cache_rate: float, num_workers: int):
-        super().__init__(data_path, train_transform=train_transform, valid_transform=valid_transform)
+    def __init__(self, data_path: str, cache_rate, num_workers, train_transform, val_transform):
+        super().__init__(
+            data_path, 
+            train_transform=train_transform, 
+            val_transform=val_transform)
         self.cache_rate = cache_rate
         self.num_workers = num_workers
 
@@ -16,7 +19,7 @@ class BaseCacheDataset(BaseDataset, ABC):
         pass
 
     @abstractmethod
-    def valid_dataset(self):
+    def val_dataset(self):
         """
         This method should be implemented in the subclass to return the validation dataset.
         """

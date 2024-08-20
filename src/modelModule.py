@@ -23,7 +23,7 @@ class ModelModule(L.LightningModule):
         select_model = getattr(import_module("src.models"), model_name)
         self._model = select_model()
 
-        self.criterion = DiceLoss(to_onehot_y=True, softmax=True)
+        self.criterion = DiceLoss(smooth_nr=0, smooth_dr=1e-5, squared_pred=True, to_onehot_y=False, sigmoid=True)
 
     def forward(self, x):
         return self._model(x)
@@ -53,6 +53,8 @@ class ModelModule(L.LightningModule):
     def validation_step(self, batch, batch_idx):
         x, y = batch["image"], batch["label"]
         logits = self.forward(x)
+        print(y.shape)
+        print(logits.shape)
         loss = self.criterion(logits, y)
         y_pred = self._inference(x)
         dice = compute_generalized_dice(y_pred, y)

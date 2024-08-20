@@ -23,6 +23,3 @@ class BratsAugmentation_base(BaseAugmentation):
                 Resized(keys=["label"], spatial_size=[128, 128, 80], mode="nearest"),
             ]
         )
-
-    def __call__(self):
-        return self.transform
