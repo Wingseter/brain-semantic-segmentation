@@ -6,10 +6,15 @@ from monai.data.dataset import CacheDataset
 
 class BrainDataset(BaseCacheDataset):
     def __init__(self, data_path, train_transform, valid_transform, cache_rate, num_workers, train_valid_test_split_rate):
-        super().__init__(data_path, train_transform, valid_transform, cache_rate, num_workers)
+        super().__init__(\
+            data_path,\
+            train_transform, \
+            valid_transform, \
+            cache_rate, \
+            num_workers)
+        
         self.train_valid_teest_split_rate = train_valid_test_split_rate
 
-    def setup(self):
         self.image_path = Path(self.data_path) / "image"
         self.label_path = Path(self.data_path) / "label"
         self.train_data_dicts = []
