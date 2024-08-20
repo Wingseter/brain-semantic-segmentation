@@ -13,7 +13,8 @@ class ModelModule(L.LightningModule):
         self,
         model_name: str = "BaseModel",
         learning_rate: float = 1e-2,
-        use_scheduler: bool = True,    
+        use_scheduler: bool = True,  
+        model_params: dict = None
     ):
         super().__init__()
         self.save_hyperparameters()
@@ -21,7 +22,7 @@ class ModelModule(L.LightningModule):
         self.use_scheduler = use_scheduler
 
         select_model = getattr(import_module("src.models"), model_name)
-        self._model = select_model()
+        self._model = select_model(model_params)
 
         self.criterion = DiceLoss(smooth_nr=0, smooth_dr=1e-5, squared_pred=True, to_onehot_y=False, sigmoid=True)
 

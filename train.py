@@ -39,8 +39,9 @@ def train(cfg:DictConfig) -> None:
 
     model = ModelModule(
         model_name = cfg.model_name,
-        learning_rate = cfg.model_params.learning_rate,
-        use_scheduler = cfg.model_params.use_scheduler,
+        learning_rate = cfg.learning_rate,
+        use_scheduler = cfg.use_scheduler,
+        model_params = cfg.model_params
     )
 
     logger = TensorBoardLogger(save_dir=cfg.logs_dir, name = "", version=run_id)

@@ -54,7 +54,6 @@ class DataModule(L.LightningDataModule):
             self.test_data = self.brain_dataset.test_dataset()
 
     def train_dataloader(self):
-        print("num Workers train_dataloader" ,self.num_workers)
         return DataLoader(
             self.train_data,
             batch_size=self.train_batch_size,

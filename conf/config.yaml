@@ -1,5 +1,5 @@
 task: "brain-sementic-segmentation"
-device: "auto"
+device: "cpu"
 num_workers: 3
 seed: 42
 max_epochs: 100
@@ -18,11 +18,17 @@ dataset_params:
   num_workers: 3
   train_valid_test_split_rate: [0.7, 0.2, 0.1]
 
-model_name: "SegResnet_option1"
+model_name: "SegResnet"
+learning_rate: 1e-2
+use_scheduler: true
 model_params:
-  learning_rate: 1e-2
-  use_scheduler: true
- 
+  blocks_down: [1, 2, 2, 4]
+  blocks_up: [1, 1, 1]
+  init_filters: 16
+  in_channels: 4
+  out_channels: 3
+  dropout_prob: 0.2
+
 
 logs_dir: logs
 checkpoint_dirpath: checkpoints
