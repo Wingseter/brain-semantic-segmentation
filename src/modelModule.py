@@ -43,7 +43,7 @@ class ModelModule(L.LightningModule):
                 network = self._model,
             )
         
-        VAL_AMP = True
+        VAL_AMP = False
         if VAL_AMP:
             with torch.amp.autocast():
                 return _compute(input)
@@ -53,14 +53,12 @@ class ModelModule(L.LightningModule):
     def validation_step(self, batch, batch_idx):
         x, y = batch["image"], batch["label"]
         logits = self.forward(x)
-        print(y.shape)
-        print(logits.shape)
         loss = self.criterion(logits, y)
         y_pred = self._inference(x)
         dice = compute_generalized_dice(y_pred, y)
         dice = dice.mean() if len(dice) > 0 else dice
-        self.log("val_loss", loss, on_step = True, on_epoch = True, prob_bar = True)
-        self.log("val_dice", dice, on_step = True, on_epoch = True, prob_bar = True)
+        self.log("val_loss", loss, on_step = True, on_epoch = True, prog_bar = True)
+        self.log("val_dice", dice, on_step = True, on_epoch = True, prog_bar = True)
 
     def configure_optimizers(self):
         # optimizer = torch.optim.AdamW(
