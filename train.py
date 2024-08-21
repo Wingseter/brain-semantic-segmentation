@@ -41,7 +41,7 @@ def train(cfg:DictConfig) -> None:
         model_name = cfg.model_name,
         learning_rate = cfg.learning_rate,
         use_scheduler = cfg.use_scheduler,
-        model_params = cfg.model_params
+        model_params = cfg.model_params,
         epochs= cfg.max_epochs 
     )
 
