@@ -1,21 +1,21 @@
 task: "brain-sementic-segmentation"
-device: "cpu"
-num_workers: 3
+device: "auto"
+num_workers: 8
 seed: 42
 max_epochs: 100
 
 experiment:
-  train_batch_size: 1
-  valid_batch_size: 1
+  train_batch_size: 6
+  valid_batch_size: 3
   early_stopping_patient: 20
 
 
 transform_name: "BratsAugmentation_base"
 dataset_name: "BrainDataset"
 dataset_params:
-  data_path: "/Volumes/external/DeepLearningData/BraTS2020_training_data/BraTS2020_converted"
+  data_path: "/player/data/BraTS2020_converted"
   cache_rate: 0.5
-  num_workers: 3
+  num_workers: 8
   train_valid_test_split_rate: [0.7, 0.2, 0.1]
 
 model_name: "SegResnet"
@@ -32,3 +32,4 @@ model_params:
 
 logs_dir: logs
 checkpoint_dirpath: checkpoints
+ckpt_path: "/player/workspace/Python/brain-otock/checkpoints/run-2024-08-21-09-03-23/epoch=29-step=1290-val_loss=0.88-val_dice=0.004933.ckpt"

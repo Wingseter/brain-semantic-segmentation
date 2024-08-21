@@ -5,6 +5,7 @@ from monai.networks.nets import *
 from monai.networks.layers import *
 from monai.metrics import compute_generalized_dice
 from monai.inferers import SimpleInferer, SlidingWindowInferer
+import torch.nn.functional as F
 
 from importlib import import_module
 
@@ -14,12 +15,14 @@ class ModelModule(L.LightningModule):
         model_name: str = "BaseModel",
         learning_rate: float = 1e-2,
         use_scheduler: bool = True,  
-        model_params: dict = None
+        model_params: dict = None,
+        epochs: int = 100 
     ):
         super().__init__()
         self.save_hyperparameters()
         self.learning_rate = learning_rate
         self.use_scheduler = use_scheduler
+        self.epochs = epochs
 
         select_model = getattr(import_module("src.models"), model_name)
         self._model = select_model(model_params)
@@ -55,17 +58,26 @@ class ModelModule(L.LightningModule):
         x, y = batch["image"], batch["label"]
         logits = self.forward(x)
         loss = self.criterion(logits, y)
-        y_pred = self._inference(x)
+
+        # Apply sigmoid to logits to get probabilities for binary classification
+        probs = torch.sigmoid(logits)
+
+        # Binarize the probabilities (threshold at 0.5)
+        y_pred = (probs > 0.5).float()
+
+        # Since y is already binary (0 or 1), no need for further processing
+        # Calculate Generalized Dice Score
         dice = compute_generalized_dice(y_pred, y)
         dice = dice.mean() if len(dice) > 0 else dice
-        self.log("val_loss", loss, on_step = True, on_epoch = True, prog_bar = True)
-        self.log("val_dice", dice, on_step = True, on_epoch = True, prog_bar = True)
+
+        # Log the results
+        self.log("val_loss", loss, on_step=True, on_epoch=True, prog_bar=True)
+        self.log("val_dice", dice, on_step=True, on_epoch=True, prog_bar=True)
 
     def configure_optimizers(self):
-        # optimizer = torch.optim.AdamW(
-        #     self.parameters(), lr=self.learning_rate, weight_decay=0.05
-        # )
-        optimizer = torch.optim.Adam(self.parameters(), 1e-4, weight_decay=1e-5)
+        optimizer = torch.optim.AdamW(
+            self.parameters(), lr=self.learning_rate, weight_decay=0.05
+        )
 
         configuration = {
             "optimizer": optimizer,
@@ -74,7 +86,7 @@ class ModelModule(L.LightningModule):
 
         if self.use_scheduler:
             # Add lr scheduler
-            scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer=optimizer, T_max=20)
+            scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=self.epochs)
             configuration["lr_scheduler"] = scheduler
 
         return configuration
