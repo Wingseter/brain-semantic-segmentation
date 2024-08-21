@@ -39,8 +39,10 @@ def train(cfg:DictConfig) -> None:
 
     model = ModelModule(
         model_name = cfg.model_name,
-        learning_rate = cfg.model_params.learning_rate,
-        use_scheduler = cfg.model_params.use_scheduler,
+        learning_rate = cfg.learning_rate,
+        use_scheduler = cfg.use_scheduler,
+        model_params = cfg.model_params,
+        epochs= cfg.max_epochs 
     )
 
     logger = TensorBoardLogger(save_dir=cfg.logs_dir, name = "", version=run_id)
@@ -68,9 +70,17 @@ def train(cfg:DictConfig) -> None:
         devices="auto",
         logger=logger,
         callbacks=[checkpoint_callback, lr_monitor, early_stopping],
+        log_every_n_steps=30
     )
 
-    trainer.fit(model, dm)
+    ckpt_path = cfg.get('ckpt_path', None)
+    if ckpt_path and os.path.exists(ckpt_path):
+        print(f"Resuming from checkpoint: {ckpt_path}")
+    else:
+        ckpt_path = None
+
+    # Train the model
+    trainer.fit(model, dm, ckpt_path=ckpt_path)
 
 if __name__ == "__main__":
     train()

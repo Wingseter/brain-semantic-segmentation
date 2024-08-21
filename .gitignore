@@ -198,3 +198,6 @@ Model/
 ONNX/
 outputs/
 logs/
+checkpoints/
+
+nohup.out
