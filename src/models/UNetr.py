@@ -1,14 +1,14 @@
 from .BaseModel import BaseModel
-from monai.networks.nets import unet
+from monai.networks.nets import unetr
 from monai.networks.layers import *
 
-class UNet(BaseModel):
+class UNetr(BaseModel):
     def __init__(self, model_params):
         super().__init__()
-        self.unet = UNet(
+        self.unetr = UNetr(
             **model_params
         )
 
     def forward(self, x):
-        y = self.unet(x)
+        y = self.unetr(x)
         return y
