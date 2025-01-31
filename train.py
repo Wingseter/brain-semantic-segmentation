@@ -37,6 +37,7 @@ def train(cfg:DictConfig) -> None:
         dataset_params=cfg.dataset_params
     )
 
+    # initialize Model
     model = ModelModule(
         model_name = cfg.model_name,
         learning_rate = cfg.learning_rate,
@@ -45,18 +46,22 @@ def train(cfg:DictConfig) -> None:
         epochs= cfg.max_epochs 
     )
 
+    # logger Setting
     logger = TensorBoardLogger(save_dir=cfg.logs_dir, name = "", version=run_id)
 
+    # checkpoint Setting
     checkpoint_callback = ModelCheckpoint(
         monitor = "val_loss",
         mode = "min",
         save_top_k = 2,
         dirpath = os.path.join(cfg.checkpoint_dirpath, run_id),
-        filename="{epoch}-{step}-{val_loss:.2f}-{val_dice:2f}",
+        filename=f"{cfg.model_name}" + "-{epoch}-{step}-{val_loss:.2f}-{val_dice:2f}",
     )
 
+    # LR Setting
     lr_monitor = LearningRateMonitor(logging_interval = "step")
 
+    # Additional Settings
     early_stopping = EarlyStopping(
         monitor="val_loss",
         patience=cfg.experiment.early_stopping_patient,
@@ -64,6 +69,7 @@ def train(cfg:DictConfig) -> None:
         mode="min",
     )
 
+    # Trainer
     trainer = L.Trainer(
         max_epochs=cfg.max_epochs,
         accelerator=cfg.device,
